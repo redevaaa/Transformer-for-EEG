@@ -1,59 +1,34 @@
-# Transformer for EEG
+# EEG Transformers
 
-The code has following structure:
+Modified transformer network utilizing the attention mechanism for time series or any other numerical data. A collaborative 6.100 Electrical Engineering and Computer Science Project at MIT Media Lab.
 
-1. Whole Model structure(model+optimizer+loss+data batch&masking)
-2. Generating Data set (toy data)
-3. Training Data (toy data)
-4. Predict Data (toy data)
-5. Generating Data set (eeg data)
-6. Training Data (eeg data)
-7. Predict Data (eeg data)
+## The origianl NLP paper and Transformer model
+publication of Google - https://arxiv.org/pdf/1706.03762.pdf
 
-##  Training
+annotated transformer of Harvard NLP - http://nlp.seas.harvard.edu/2018/04/03/attention.html
 
-   ***All training part is written in the 'Training For … Data Cell'***
+## Prerequisites
 
-1. I use ***Batch Class*** to store data along with corresponding masks. If you want to use your own dataset, you have to create a similar data_gen function as below to transfer raw input data into Batch data. Start symbol is your own choice.
+- Python 3.6+
+- [Pytorch Stable(1.1)](https://pytorch.org)
+- [SciPy](http://www.scipy.org/install.html)
+- [PyLDS](https://github.com/mattjj/pylds)
 
-   ```python
-   def eeg_data_gen(dataloader,start_symbol = 1):
-       "combine src and tgt as Batch Class"
-       for idx, (data_x,data_y) in enumerate(dataloader):
-           data_x[:,0,:] = start_symbol
-           src_ = Variable(data_x.float(), requires_grad=False)
-           data_y[:,0, :] = start_symbol
-           tgt_ = Variable(data_y.float(), requires_grad=False)
-           yield Batch(src_, tgt_, 0)
-   ```
+## Partner
+Yingqi Ding (@dyq0811) - co-author
 
-2. You can set the model parameters in the cell like below.
+## Mentor
+Neo Mohsenvand (@NeoVand) - idea and guidance
 
-```python
-# Model options
-opt = {}
-opt['Transformer-layers'] = 4
-opt['Model-dimensions'] = 256
-opt['feedford-size'] = 512
-opt['headers'] = 8
-opt['dropout'] = 0.1
-opt['src_d'] = 10
-opt['tgt_d'] = 2
-```
+Mehul Smriti Raje (@mraje16) - EEG preprocessing
 
-3. If you want to use CUDA to train, adjust 2 places. First is in ***Class Batch*** cell, uncomment the part with CUDA. Second is in running part, simply uncommen ***model.cuda()***
-   ​
+## To know about our project and see the performance
+final_report.pdf - the completed presentation of the project
 
-## Predict Data
+## To understand the code
+code_explanation.pdf - all the functions are explained piece by piece
 
- ***All Prediction part is written in the 'Prediction For … Data Cell'***
+## To train the model
+EEG_train.ipynb - a training and prediction example for the EEG (Electroencephalogram) dataset
 
-1. first step is the same as above. But in this version you can only set the batch size to 1. Thus the data is [timesteps,dimensions] instead of [batch,timesteps,dimensions]
-2. using funcion viz to visualize the predicted daya vs true test data.
-
-## Important
-
-1. Transformer uses 'teacher forcing'. In training, it'd better to give the model true output but mask the future part. In this way, model will not walk on the wrong track for a long time which is meaningless. Thus the evaluation part in training is totally different in prediction part. In training, for example, you input 'abcde' and want to output '12345'. The model first get 'a' and output 'out1', then the model input true '1' instead of 'out1'. But in prediction, the model just input what it outputs.
-2. Keep in mind that the input in the training part is ' input data + output data + input mask + output mask' . 
-3. CUDA works well on training part. But in prediction, even though I just predict one batch, the memory immediately run out. I still cannot figure the reason why. 
-
+LDS_train.ipynb - a training and prediction example for the GLDS (gaussian linear dynamical systems) dataset
